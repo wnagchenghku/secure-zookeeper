@@ -36,29 +36,29 @@ import org.apache.zookeeper.data.Stat;
 
 public class benchmarkZooKeeper {
 	private int numOfThreads;
-	private String hostPort;
+	private List<String> serverList;
 	private int numberOps;
 	private boolean sync = true;
 	private ArrayList<Thread> clients;
 	    
-	public benchmarkZooKeeper(int threads, String hp, int ops) {
+	public benchmarkZooKeeper(int threads, int ops, String servers) {
 		numOfThreads = threads;
-		hostPort = hp;
+		serverList = Arrays.asList(servers.split(";"));;
 		numberOps = ops;
 		clients = new ArrayList<Thread>();
 	}
     
     public static void main(String[] args) {
         if (args.length < 3) {
-            System.out.println("Usage: java -cp $CLASSPATH benchmarkZooKeeper #threads hostPort #ops");
+            System.out.println("Usage: java -cp $CLASSPATH benchmarkZooKeeper #threads #ops serverList");
             System.exit(1);
         }
-        new benchmarkZooKeeper(Integer.parseInt(args[0]), args[1], Integer.parseInt(args[2])).go();
+        new benchmarkZooKeeper(Integer.parseInt(args[0]), Integer.parseInt(args[1]), args[2]).go();
     }
     public void go() {
     	try {
 	    	for (int i = 0; i < numOfThreads; i++) {
-					Thread t = new Thread(new ClientHandler());
+					Thread t = new Thread(new ClientHandler(serverList.get(i % serverList.size())));
 					t.start();
 					clients.add(t);
 	    	}
@@ -72,8 +72,10 @@ public class benchmarkZooKeeper {
     private class ClientHandler implements Runnable, Watcher {
 	    private volatile boolean connected = false;
 	    private volatile boolean expired = false;
+	    private String hostPort;
 
-    	public ClientHandler() throws IOException {
+    	public ClientHandler(String hp) throws IOException {
+    		hostPort = hp;
 		}
 
 	    public void process(WatchedEvent e) {  
