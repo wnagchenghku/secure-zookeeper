@@ -43,7 +43,7 @@ public class benchmarkZooKeeper {
 	    
 	public benchmarkZooKeeper(int threads, int ops, String servers) {
 		numOfThreads = threads;
-		serverList = Arrays.asList(servers.split(";"));;
+		serverList = Arrays.asList(servers.split(","));;
 		numberOps = ops;
 		clients = new ArrayList<Thread>();
 	}
@@ -144,7 +144,7 @@ public class benchmarkZooKeeper {
 		            }
 				}
 				long end = System.currentTimeMillis();
-				System.out.println("thread " + Thread.currentThread().getId() + ", " + numberOps + " ops, " + (end - start) + " milliseconds");
+				System.out.println("thread " + Thread.currentThread().getId() + ", " + hostPort + ", " + numberOps + " ops, " + (end - start) + " milliseconds");
 				zk.delete(path, -1);
 				zk.close();
 			} catch (IOException | InterruptedException | KeeperException e) {
