@@ -36,14 +36,14 @@ import org.apache.zookeeper.data.Stat;
 
 public class benchmarkZooKeeper {
 	private int numOfThreads;
-	private List<String> serverList;
+	private String[] serverList;
 	private int numberOps;
 	private boolean sync = true;
 	private ArrayList<Thread> clients;
 	    
 	public benchmarkZooKeeper(int threads, int ops, String servers) {
 		numOfThreads = threads;
-		serverList = Arrays.asList(servers.split(","));;
+		serverList = servers.split(",");;
 		numberOps = ops;
 		clients = new ArrayList<Thread>();
 	}
@@ -58,7 +58,7 @@ public class benchmarkZooKeeper {
     public void go() {
     	try {
 	    	for (int i = 0; i < numOfThreads; i++) {
-					Thread t = new Thread(new ClientHandler(serverList.get(i % serverList.size())));
+					Thread t = new Thread(new ClientHandler(serverList[i % serverList.length]));
 					t.start();
 					clients.add(t);
 	    	}
